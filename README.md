@@ -1,189 +1,189 @@
-# 🎵 MyDJ26 - Discord Müzik Botu
+# 🎵 MyDJ26 - Discord Music Bot
 
-**MyDJ26** - YouTube ve Spotify destekli modern Discord müzik botu
+**MyDJ26** - Modern Discord music bot with YouTube and Spotify support
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![Discord.py](https://img.shields.io/badge/discord.py-2.0+-blue.svg)](https://github.com/Rapptz/discord.py)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## ✨ Özellikler
+## ✨ Features
 
-- 🎵 **YouTube ve Spotify desteği** - Hem link hem de şarkı ismi ile arama
-- 🎶 **Akıllı kuyruk sistemi** - Sıralı çalma ve kuyruk yönetimi
-- ⏯️ **Tam çalma kontrolü** - Pause, resume, skip, stop komutları
-- 🔀 **Kuyruk karıştırma** - Rastgele çalma özelliği
-- 📝 **Şarkı sözleri** - Anlık şarkı sözü getirme
-- 🧹 **Mesaj temizleme** - Kanal düzenleme komutları
-- 🔊 **Otomatik ses kanalı yönetimi** - Akıllı bağlantı ve geçiş
-- 🛡️ **Hata yönetimi** - Kapsamlı hata yakalama ve kullanıcı dostu mesajlar
+- 🎵 **YouTube and Spotify support** - Play using links or search by song name
+- 🎶 **Smart queue system** - Sequential playback and queue management
+- ⏯️ **Full playback control** - Pause, resume, skip, stop commands
+- 🔀 **Queue shuffling** - Random playback feature
+- 📝 **Song lyrics** - Real-time lyrics fetching
+- 🧹 **Message cleanup** - Channel management commands
+- 🔊 **Auto voice channel management** - Smart connection and switching
+- 🛡️ **Error handling** - Comprehensive error catching with user-friendly messages
 
-## 🚀 Hızlı Başlangıç
+## 🚀 Quick Start
 
-### Gereksinimler
+### Requirements
 
-- Python 3.8 veya üzeri
-- [FFmpeg](https://ffmpeg.org/download.html) (ses işleme için)
+- Python 3.8 or higher
+- [FFmpeg](https://ffmpeg.org/download.html) (for audio processing)
 - Discord Bot Token ([Discord Developer Portal](https://discord.com/developers/applications))
 
-### Kurulum
+### Installation
 
-1. **Projeyi klonlayın:**
+1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/MyDJ26.git
-   cd MyDJ26
+   git clone https://github.com/Pextremen/Discord-DJ.git
+   cd Discord-DJ
    ```
 
-2. **Gerekli kütüphaneleri yükleyin:**
+2. **Install required packages:**
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Environment dosyasını oluşturun:**
+3. **Create environment file:**
    ```bash
    cp env.example .env
    ```
 
-4. **Discord Bot Token'ınızı ekleyin:**
-   - `.env` dosyasını açın
-   - `your_discord_bot_token_here` yazan yere gerçek token'ınızı yazın
+4. **Add your Discord Bot Token:**
+   - Open the `.env` file
+   - Replace `your_discord_bot_token_here` with your actual token
    ```
    DISCORD_BOT_TOKEN=YOUR_ACTUAL_TOKEN_HERE
    ```
 
-5. **Botu çalıştırın:**
+5. **Run the bot:**
    ```bash
    python music_bot.py
    ```
 
-## 🎮 Komutlar
+## 🎮 Commands
 
-### Müzik Komutları
-| Komut | Kısayol | Açıklama |
-|-------|---------|----------|
-| `+play <şarkı/link>` | `+p` | YouTube/Spotify linkini çalar veya şarkı ismi arar |
-| `+queue` | `+q` | Müzik kuyruğunu gösterir |
-| `+skip` | `+s` | Şu anki şarkıyı atlar |
-| `+shuffle` | - | Kuyruğu karıştırır |
-| `+pause` | - | Müziği duraklatır |
-| `+resume` | - | Müziği devam ettirir |
-| `+stop` | - | Müziği durdurur ve kuyruğu temizler |
-| `+disconnect` | `+leave`, `+dc` | Ses kanalından ayrılır |
+### Music Commands
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `+play <song/link>` | `+p` | Plays YouTube/Spotify links or searches by song name |
+| `+queue` | `+q` | Shows the music queue |
+| `+skip` | `+s` | Skips the current song |
+| `+shuffle` | - | Shuffles the queue |
+| `+pause` | - | Pauses the music |
+| `+resume` | - | Resumes the music |
+| `+stop` | - | Stops music and clears queue |
+| `+disconnect` | `+leave`, `+dc` | Disconnects from voice channel |
 
-### Diğer Komutlar
-| Komut | Kısayol | Açıklama |
-|-------|---------|----------|
-| `+lyrics [şarkı]` | `+lyric` | Şarkı sözlerini getirir (boş bırakılırsa çalan şarkının) |
-| `+clear [sayı]` | `+c`, `+clean` | Belirtilen sayıda mesajı siler (varsayılan: 10) |
+### Other Commands
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `+lyrics [song]` | `+lyric` | Gets song lyrics (leave empty for current song) |
+| `+clear [number]` | `+c`, `+clean` | Deletes specified number of messages (default: 10) |
 
-### Kullanım Örnekleri
+### Usage Examples
 
 ```bash
-# YouTube video çalma
+# Play YouTube video
 +play https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
-# Spotify şarkısı çalma
+# Play Spotify song
 +play https://open.spotify.com/track/4iV5W9uYEdYUVa79Axb7Rh
 
-# Şarkı ismi ile arama
+# Search by song name
 +play imagine dragons believer
 
-# Kuyruk kontrolü
+# Queue control
 +queue
 +skip
 +shuffle
 
-# Şarkı sözleri
+# Song lyrics
 +lyrics bohemian rhapsody
-+lyrics  # (şu an çalan şarkının sözleri)
++lyrics  # (lyrics for currently playing song)
 ```
 
-## 🛠️ Geliştirme
+## 🛠️ Development
 
-### Proje Yapısı
+### Project Structure
 ```
-MyDJ26/
-├── music_bot.py          # Ana bot dosyası
-├── requirements.txt      # Python bağımlılıkları
-├── env.example          # Örnek environment dosyası
-├── .gitignore           # Git ignore kuralları
-├── Dockerfile           # Docker container tanımı
+Discord-DJ/
+├── music_bot.py          # Main bot file
+├── requirements.txt      # Python dependencies
+├── env.example          # Example environment file
+├── .gitignore           # Git ignore rules
+├── Dockerfile           # Docker container definition
 ├── Procfile             # Heroku deployment
-└── README.md            # Bu dosya
+└── README.md            # This file
 ```
 
-### Katkıda Bulunma
+### Contributing
 
-1. Bu repository'yi fork edin
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Değişikliklerinizi commit edin (`git commit -m 'Add amazing feature'`)
-4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
-5. Pull Request oluşturun
+1. Fork this repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📋 Discord Bot Kurulumu
+## 📋 Discord Bot Setup
 
-1. [Discord Developer Portal](https://discord.com/developers/applications)'a gidin
-2. "New Application" butonuna tıklayın
-3. Uygulamanıza bir isim verin
-4. "Bot" sekmesine gidin
-5. "Add Bot" butonuna tıklayın
-6. "Token" bölümünden token'ınızı kopyalayın
-7. "Privileged Gateway Intents" altında "Message Content Intent"'i aktif edin
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
+2. Click "New Application"
+3. Give your application a name
+4. Go to the "Bot" tab
+5. Click "Add Bot"
+6. Copy the token from the "Token" section
+7. Enable "Message Content Intent" under "Privileged Gateway Intents"
 
-### Bot İzinleri
-Botunuzu sunucuya eklerken şu izinlere ihtiyaç vardır:
+### Bot Permissions
+When adding the bot to your server, it needs these permissions:
 - ✅ Send Messages
-- ✅ Connect (Ses kanallarına bağlanma)
-- ✅ Speak (Ses kanallarında konuşma)
+- ✅ Connect (to voice channels)
+- ✅ Speak (in voice channels)
 - ✅ Use Voice Activity
-- ✅ Manage Messages (clear komutu için)
+- ✅ Manage Messages (for clear command)
 
-## 🐳 Docker ile Çalıştırma
+## 🐳 Running with Docker
 
 ```bash
-# Docker image oluştur
+# Build Docker image
 docker build -t mydj26 .
 
-# Container çalıştır (.env dosyası gerekli)
+# Run container (requires .env file)
 docker run --env-file .env mydj26
 ```
 
-## ☁️ Deploy (Heroku)
+## ☁️ Deploy to Heroku
 
-1. [Heroku](https://heroku.com)'da hesap oluşturun
-2. Heroku CLI'yi yükleyin
-3. Terminal'de:
+1. Create an account on [Heroku](https://heroku.com)
+2. Install Heroku CLI
+3. In terminal:
    ```bash
    heroku create your-bot-name
    heroku config:set DISCORD_BOT_TOKEN=your_token_here
    git push heroku main
    ```
 
-## 🔧 Sorun Giderme
+## 🔧 Troubleshooting
 
-### Yaygın Hatalar
+### Common Errors
 
-**"DISCORD_BOT_TOKEN environment variable'ı bulunamadı!"**
-- `.env` dosyasının doğru oluşturulduğundan emin olun
-- Token'ın doğru kopyalandığından emin olun
+**"DISCORD_BOT_TOKEN environment variable not found!"**
+- Make sure the `.env` file is created correctly
+- Verify the token is copied correctly
 
-**"Ses kanalına bağlanamıyorum"**
-- Bot'un ses kanalı izinlerini kontrol edin
-- FFmpeg'in doğru yüklendiğinden emin olun
+**"Cannot connect to voice channel"**
+- Check bot's voice channel permissions
+- Make sure FFmpeg is installed correctly
 
-**"YouTube bot koruması aktif!"**
-- Birkaç dakika bekleyin ve tekrar deneyin
-- Şarkı ismini yazarak deneyin
+**"YouTube bot protection is active!"**
+- Wait a few minutes and try again
+- Try searching by song name instead
 
-## 📄 Lisans
+## 📄 License
 
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) file for details.
 
-## 🙏 Teşekkürler
+## 🙏 Acknowledgments
 
 - [discord.py](https://github.com/Rapptz/discord.py) - Discord API wrapper
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp) - YouTube video indirici
-- [FFmpeg](https://ffmpeg.org/) - Ses işleme
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) - YouTube video downloader
+- [FFmpeg](https://ffmpeg.org/) - Audio processing
 
 ---
 
-⭐ **Bu projeyi beğendiyseniz star vermeyi unutmayın!** 
+⭐ **If you like this project, don't forget to give it a star!** 
