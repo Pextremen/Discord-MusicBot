@@ -147,16 +147,44 @@ docker build -t mydj26 .
 docker run --env-file .env mydj26
 ```
 
-## ☁️ Deploy to Heroku
+## ☁️ Deploy to Railway
 
-1. Create an account on [Heroku](https://heroku.com)
-2. Install Heroku CLI
-3. In terminal:
+Railway is a modern cloud platform that makes deployment simple and fast.
+
+1. **Create a Railway account:**
+   - Go to [Railway.app](https://railway.app)
+   - Sign up with GitHub
+
+2. **Deploy your project:**
    ```bash
-   heroku create your-bot-name
-   heroku config:set DISCORD_BOT_TOKEN=your_token_here
-   git push heroku main
+   # Install Railway CLI (optional)
+   npm install -g @railway/cli
+   
+   # Login to Railway
+   railway login
    ```
+
+3. **Deploy from GitHub:**
+   - Go to [Railway Dashboard](https://railway.app/dashboard)
+   - Click "New Project"
+   - Select "Deploy from GitHub repo"
+   - Choose your `Discord-DJ` repository
+   - Railway will automatically detect it's a Python project
+
+4. **Add Environment Variables:**
+   - In your Railway project dashboard
+   - Go to "Variables" tab
+   - Add: `DISCORD_BOT_TOKEN` = `your_actual_token_here`
+
+5. **Deploy:**
+   - Railway will automatically build and deploy your bot
+   - Your bot will be live in seconds!
+
+### Railway Features:
+- ✅ **Automatic deploys** - Pushes to main branch auto-deploy
+- ✅ **Free tier** - Great for small bots
+- ✅ **Easy scaling** - Upgrade when needed
+- ✅ **Built-in monitoring** - Logs and metrics included
 
 ## 🔧 Troubleshooting
 
