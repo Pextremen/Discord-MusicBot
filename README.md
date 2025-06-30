@@ -6,6 +6,36 @@
 [![Discord.py](https://img.shields.io/badge/discord.py-2.0+-blue.svg)](https://github.com/Rapptz/discord.py)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
+## 🔥 Latest Major Update
+
+### ✨ What's New in This Release:
+
+#### 🛡️ YouTube Bot Protection Solutions
+- **🔄 Invidious Backup System** - Automatically switches to alternative YouTube frontends when main YouTube fails
+- **🤖 Multi-Client Strategy** - Tries Android, Web, and Basic clients for maximum compatibility
+- **🔀 User-Agent Rotation** - Uses different browser identities to avoid detection
+- **🐳 Container Optimization** - Specially optimized for Railway/Docker cloud deployment
+
+#### 🔒 Security & Code Quality Improvements
+- **❌ Removed Hardcoded Tokens** - All sensitive data now uses environment variables
+- **🌐 International Code Standards** - Comments and documentation converted to English
+- **🛠️ Enhanced Error Handling** - Specific solutions for each error type
+- **📝 Professional Documentation** - Comprehensive README with troubleshooting guides
+
+#### 🇹🇷 User Experience Enhancements
+- **Turkish Interface** - Full Turkish user interface for Turkish users
+- **📊 Advanced Status Command** - Detailed bot statistics with `+status`
+- **❓ Comprehensive Help System** - Complete command guide with `+komutlar`
+- **🔄 Smart Fallback System** - Automatically tries next method when one fails
+
+#### 🎵 Music Features
+- **📝 Enhanced Lyrics System** - Integration with lyrics.ovh API
+- **⏭️ Smart Queue Management** - Continues to next song on errors
+- **🎶 Multiple Format Support** - M4A, WebM, MP4 compatibility
+- **🔊 Improved Audio Quality** - Better audio extraction strategies
+
+> 🚀 **Ready for Production**: This update makes the bot significantly more reliable against YouTube restrictions and ready for cloud deployment!
+
 ## ✨ Features
 
 ### 🚀 Core Features
