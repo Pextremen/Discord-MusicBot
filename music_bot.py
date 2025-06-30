@@ -263,31 +263,31 @@ class YTDLSource(discord.PCMVolumeTransformer):
 async def on_ready():
     print(f'{bot.user} logged in successfully!')
 
-@bot.command(name='play', aliases=['p'])
+@bot.command(name='play', aliases=['p', 'cal', 'oynat'])
 async def play(ctx, *, query):
     """Play music - accepts YouTube links, Spotify links or song names"""
     
     if not ctx.author.voice:
-        await ctx.send("Önce bir ses kanalına katılmalısın!")
+        await ctx.send("You must join a voice channel first!")
         return
 
     channel = ctx.author.voice.channel
     
     if ctx.voice_client is None:
         try:
-            await ctx.send("Ses kanalına bağlanmaya çalışıyorum...")
+            await ctx.send("Trying to connect to voice channel...")
             voice_client = await channel.connect(timeout=60.0, reconnect=True)
-            await ctx.send(f"✅ {channel.name} kanalına başarıyla bağlandım!")
+            await ctx.send(f"✅ Successfully connected to {channel.name}!")
         except Exception as e:
-            await ctx.send(f"❌ Ses kanalına bağlanamıyorum: {str(e)}")
-            await ctx.send("💡 Çözüm önerileri:\n- Farklı bir ses kanalı deneyin\n- Sunucu voice region'ını değiştirin\n- Botun ses kanalı izinlerini kontrol edin")
+            await ctx.send(f"❌ Cannot connect to voice channel: {str(e)}")
+            await ctx.send("💡 Solutions:\n- Try a different voice channel\n- Change server voice region\n- Check bot's voice channel permissions")
             return
     elif ctx.voice_client.channel != channel:
         try:
             await ctx.voice_client.move_to(channel)
-            await ctx.send(f"✅ {channel.name} kanalına taşındım!")
+            await ctx.send(f"✅ Moved to {channel.name}!")
         except Exception as e:
-            await ctx.send(f"❌ Kanal değiştirilemedi: {str(e)}")
+            await ctx.send(f"❌ Could not switch channel: {str(e)}")
             return
 
     guild_id = ctx.guild.id
@@ -296,27 +296,27 @@ async def play(ctx, *, query):
 
     async with ctx.typing():
         try:
-            # Spotify linklerini YouTube'da arama
+            # Search Spotify links on YouTube
             if 'spotify.com' in query:
-                await ctx.send("🎵 Spotify linki algılandı, şarkı bilgileri çıkarılıyor...")
+                await ctx.send("🎵 Spotify link detected, extracting song info...")
                 
-                # Spotify'dan şarkı bilgilerini al
+                # Get song info from Spotify
                 track_info = await get_spotify_track_info(query)
                 
                 if track_info:
-                    await ctx.send(f"🔍 **{track_info}** YouTube'da aranıyor...")
+                    await ctx.send(f"🔍 Searching YouTube for **{track_info}**...")
                     query = f"ytsearch:{track_info}"
                 else:
-                    await ctx.send("❌ Spotify şarkı bilgileri alınamadı. Lütfen şarkı ismini yazarak deneyin.")
+                    await ctx.send("❌ Could not extract Spotify song info. Please try typing the song name.")
                     return
                     
             elif not query.startswith('http'):
-                # Şarkı ismi ise YouTube'da ara
+                # If it's a song name, search on YouTube
                 query = f"ytsearch:{query}"
 
-            # Ana arama denemesi - YouTube + cookies authentication
+            # Main search attempt - YouTube + cookies authentication
             player = None
-            search_message = await ctx.send("🔍 Aranıyor...")
+            search_message = await ctx.send("🔍 Searching...")
             
             # İlk önce direkt linkler için deneme
             if query.startswith('http'):
@@ -328,10 +328,10 @@ async def play(ctx, *, query):
                     print(f"Direkt link başarısız: {e}")
             
             # Arama gerekliyse
-            if not player:
+                            if not player:
                 base_query = query.replace("ytsearch:", "").strip()
                 
-                # YouTube authentication ile arama
+                # YouTube authentication search
                 search_attempts = [
                     f"ytsearch1:{base_query}",
                     f"ytsearch3:{base_query}",
@@ -340,22 +340,22 @@ async def play(ctx, *, query):
                 youtube_success = False
                 for i, attempt_query in enumerate(search_attempts):
                     try:
-                        await search_message.edit(content=f"🔍 YouTube'da aranıyor... ({i+1}/2) [Container Optimized]")
+                        await search_message.edit(content=f"🔍 Searching YouTube... ({i+1}/2) [Container Optimized]")
                         player = await YTDLSource.from_url(attempt_query, loop=bot.loop, stream=True)
                         
                         if player and player.title:
-                            await search_message.edit(content=f"✅ YouTube'da bulundu: **{player.title}**")
+                            await search_message.edit(content=f"✅ Found on YouTube: **{player.title}**")
                             youtube_success = True
                             break
                             
                     except Exception as attempt_error:
                         error_msg = str(attempt_error)
-                        print(f"⚠️ YouTube arama hatası: {error_msg}")
+                        print(f"⚠️ YouTube search error: {error_msg}")
                         continue
                 
-                # YouTube başarısızsa Invidious fallback
+                # Invidious fallback if YouTube fails
                 if not youtube_success:
-                    await search_message.edit(content="🔄 YouTube başarısız! Alternatif arama yapılıyor...")
+                    await search_message.edit(content="🔄 YouTube failed! Trying alternative search...")
                     
                     try:
                         invidious_results = await search_invidious(base_query, max_results=3)
@@ -363,60 +363,60 @@ async def play(ctx, *, query):
                         if invidious_results:
                             for result in invidious_results:
                                 try:
-                                    await search_message.edit(content=f"🔄 Invidious'tan deneniyor: **{result['title'][:50]}...**")
+                                    await search_message.edit(content=f"🔄 Trying from Invidious: **{result['title'][:50]}...**")
                                     
-                                    # Invidious URL ile dene
+                                    # Try with Invidious URL
                                     player = await YTDLSource.from_url(result['url'], loop=bot.loop, stream=True)
                                     
                                     if player and player.title:
-                                        await search_message.edit(content=f"✅ Invidious'tan bulundu: **{player.title}**")
+                                        await search_message.edit(content=f"✅ Found on Invidious: **{player.title}**")
                                         break
                                         
                                 except Exception as inv_error:
-                                    print(f"Invidious URL başarısız: {inv_error}")
+                                    print(f"Invidious URL failed: {inv_error}")
                                     continue
                         else:
-                            await search_message.edit(content="❌ Hiçbir arama yöntemi başarılı olmadı")
+                            await search_message.edit(content="❌ No search method succeeded")
                             
                     except Exception as invidious_error:
-                        print(f"Invidious arama hatası: {invidious_error}")
-                        await search_message.edit(content="❌ Alternatif arama da başarısız")
+                        print(f"Invidious search error: {invidious_error}")
+                        await search_message.edit(content="❌ Alternative search also failed")
             
             if player is None:
-                await search_message.edit(content="❌ Şarkı bulunamadı!")
-                await ctx.send("💡 **Öneriler:**\n• Şarkı ismini daha net yazın\n• Sanatçı adını ekleyin\n• İngilizce karakterler kullanın\n• Birkaç dakika bekleyip tekrar deneyin")
+                await search_message.edit(content="❌ Song not found!")
+                await ctx.send("💡 **Suggestions:**\n• Try a more specific song name\n• Include the artist name\n• Use English characters\n• Wait a few minutes and try again")
                 return
             
             if ctx.voice_client.is_playing() or ctx.voice_client.is_paused():
                 queues[guild_id].append(player)
-                await ctx.send(f'**{player.title}** kuyruğa eklendi!')
+                await ctx.send(f'**{player.title}** added to queue!')
             else:
                 ctx.voice_client.play(player, after=lambda e: asyncio.run_coroutine_threadsafe(play_next(ctx), bot.loop))
-                await ctx.send(f'🎵 Şu an çalıyor: **{player.title}**')
+                await ctx.send(f'🎵 Now playing: **{player.title}**')
 
         except Exception as e:
             error_msg = str(e)
             if "Sign in to confirm" in error_msg or "robot" in error_msg.lower():
-                await ctx.send("❌ **YouTube bot koruması aktif!**")
-                await ctx.send("💡 **Çözüm önerileri:**\n• 5-10 dakika bekleyin ve tekrar deneyin\n• Daha kısa ve basit şarkı isimleri kullanın\n• VPN kullanarak farklı bir konumdan deneyin")
-            elif "Tüm extraction stratejileri başarısız" in error_msg:
-                await ctx.send("❌ **YouTube extraction başarısız!**")
-                await ctx.send("💡 **Sistem durumu:**\n• 3 farklı client stratejisi denendi\n• Invidious backup sistemi de başarısız\n• Container environment optimized\n• 10-15 dakika bekleyip tekrar deneyin")
-            elif "Video unavailable" in error_msg or "Video erişilemez" in error_msg:
-                await ctx.send("❌ Video mevcut değil veya bölgenizde erişilebilir değil!")
-                await ctx.send("💡 Farklı bir video veya şarkı ismi deneyin.")
+                await ctx.send("❌ **YouTube bot protection is active!**")
+                await ctx.send("💡 **Solutions:**\n• Wait 5-10 minutes and try again\n• Use shorter and simpler song names\n• Try using VPN from different location")
+            elif "All extraction strategies failed" in error_msg:
+                await ctx.send("❌ **YouTube extraction failed!**")
+                await ctx.send("💡 **System status:**\n• 3 different client strategies attempted\n• Invidious backup system also failed\n• Container environment optimized\n• Wait 10-15 minutes and try again")
+            elif "Video unavailable" in error_msg:
+                await ctx.send("❌ Video is unavailable or not accessible in your region!")
+                await ctx.send("💡 Try a different video or song name.")
             elif "Private video" in error_msg:
-                await ctx.send("❌ Bu video özel (private) olarak ayarlanmış!")
+                await ctx.send("❌ This video is set to private!")
             elif "age-restricted" in error_msg.lower():
-                await ctx.send("❌ Bu video yaş kısıtlaması nedeniyle çalınamıyor!")
+                await ctx.send("❌ This video cannot be played due to age restrictions!")
             else:
-                await ctx.send(f"❌ **Beklenmeyen hata:** {error_msg[:150]}...")
-                await ctx.send("💡 Lütfen farklı bir şarkı deneyin veya daha sonra tekrar deneyin.")
-                print(f"Play command error: {error_msg}")  # Debug için
+                await ctx.send(f"❌ **Unexpected error:** {error_msg[:150]}...")
+                await ctx.send("💡 Please try a different song or try again later.")
+                print(f"Play command error: {error_msg}")  # For debugging
                 
-            # Hata durumunda kuyruktaki bir sonraki şarkıya geç
+            # In case of error, move to next song in queue
             if guild_id in queues and queues[guild_id]:
-                await ctx.send("🔄 Kuyruktaki sonraki şarkıya geçiliyor...")
+                await ctx.send("🔄 Moving to next song in queue...")
                 await play_next(ctx)
 
 async def play_next(ctx):
@@ -425,36 +425,36 @@ async def play_next(ctx):
     if guild_id in queues and queues[guild_id]:
         player = queues[guild_id].popleft()
         ctx.voice_client.play(player, after=lambda e: asyncio.run_coroutine_threadsafe(play_next(ctx), bot.loop))
-        await ctx.send(f'🎵 Şu an çalıyor: **{player.title}**')
+        await ctx.send(f'🎵 Now playing: **{player.title}**')
 
-@bot.command(name='queue', aliases=['q'])
+@bot.command(name='queue', aliases=['q', 'kuyruk'])
 async def queue(ctx):
     """Show the music queue"""
     guild_id = ctx.guild.id
     
     if guild_id not in queues or not queues[guild_id]:
-        await ctx.send("📋 Kuyruk boş!")
+        await ctx.send("📋 Queue is empty!")
         return
     
     queue_list = list(queues[guild_id])
     queue_text = "\n".join([f"{i+1}. {song.title}" for i, song in enumerate(queue_list[:10])])
     
     if len(queue_list) > 10:
-        queue_text += f"\n... ve {len(queue_list) - 10} şarkı daha"
+        queue_text += f"\n... and {len(queue_list) - 10} more songs"
     
-    embed = discord.Embed(title="📋 Müzik Kuyruğu", description=queue_text, color=0x0099ff)
+    embed = discord.Embed(title="📋 Music Queue", description=queue_text, color=0x0099ff)
     await ctx.send(embed=embed)
 
-@bot.command(name='skip', aliases=['s'])
+@bot.command(name='skip', aliases=['s', 'atla'])
 async def skip(ctx):
     """Skip the current song"""
     if ctx.voice_client and ctx.voice_client.is_playing():
         ctx.voice_client.stop()
-        await ctx.send("⏭️ Şarkı atlandı!")
+        await ctx.send("⏭️ Song skipped!")
     else:
-        await ctx.send("❌ Şu anda çalan bir şarkı yok!")
+        await ctx.send("❌ No song is currently playing!")
 
-@bot.command(name='stop')
+@bot.command(name='stop', aliases=['durdur'])
 async def stop(ctx):
     """Stop music and clear queue"""
     guild_id = ctx.guild.id
@@ -463,62 +463,62 @@ async def stop(ctx):
     
     if ctx.voice_client:
         ctx.voice_client.stop()
-        await ctx.send("⏹️ Müzik durduruldu ve kuyruk temizlendi!")
+        await ctx.send("⏹️ Music stopped and queue cleared!")
     else:
-        await ctx.send("❌ Bot herhangi bir ses kanalında değil!")
+        await ctx.send("❌ Bot is not in any voice channel!")
 
-@bot.command(name='pause')
+@bot.command(name='pause', aliases=['dur'])
 async def pause(ctx):
     """Pause the music"""
     if ctx.voice_client and ctx.voice_client.is_playing():
         ctx.voice_client.pause()
-        await ctx.send("⏸️ Müzik duraklatıldı!")
+        await ctx.send("⏸️ Music paused!")
     else:
-        await ctx.send("❌ Şu anda çalan bir şarkı yok!")
+        await ctx.send("❌ No song is currently playing!")
 
-@bot.command(name='resume')
+@bot.command(name='resume', aliases=['devam'])
 async def resume(ctx):
     """Resume the music"""
     if ctx.voice_client and ctx.voice_client.is_paused():
         ctx.voice_client.resume()
-        await ctx.send("▶️ Müzik devam ettiriliyor!")
+        await ctx.send("▶️ Music resumed!")
     else:
-        await ctx.send("❌ Müzik duraklatılmış değil!")
+        await ctx.send("❌ Music is not paused!")
 
-@bot.command(name='disconnect', aliases=['leave', 'dc'])
+@bot.command(name='disconnect', aliases=['leave', 'dc', 'ayril'])
 async def disconnect(ctx):
     """Botun ses kanalından çıkmasını sağlar"""
     if ctx.voice_client:
         await ctx.voice_client.disconnect()
-        await ctx.send("🚪 Ses kanalından ayrıldım!")
+        await ctx.send("🚪 Disconnected from voice channel!")
     else:
-        await ctx.send("❌ Zaten herhangi bir ses kanalında değilim!")
+        await ctx.send("❌ I'm not in any voice channel!")
 
-@bot.command(name='shuffle')
+@bot.command(name='shuffle', aliases=['karistir'])
 async def shuffle_queue(ctx):
     """Shuffle the music queue"""
     guild_id = ctx.guild.id
     
     if guild_id not in queues or len(queues[guild_id]) < 2:
-        await ctx.send("❌ Karıştırmak için kuyrukte en az 2 şarkı olmalı!")
+        await ctx.send("❌ Need at least 2 songs in queue to shuffle!")
         return
     
-    # Deque'yu listeye çevir, karıştır, tekrar deque yap
+    # Convert deque to list, shuffle, convert back to deque
     import random
     queue_list = list(queues[guild_id])
     random.shuffle(queue_list)
     queues[guild_id] = deque(queue_list)
     
-    await ctx.send("🔀 Kuyruk karıştırıldı!")
+    await ctx.send("🔀 Queue shuffled!")
 
-@bot.command(name='lyrics', aliases=['lyric'])
+@bot.command(name='lyrics', aliases=['lyric', 'sozler'])
 async def get_lyrics(ctx, *, query=None):
     """Get song lyrics"""
     if not query:
         if ctx.voice_client and ctx.voice_client.source:
             query = ctx.voice_client.source.title
         else:
-            await ctx.send("❌ Şarkı ismi belirtin veya bir şarkı çalın!")
+            await ctx.send("❌ Please specify a song name or play a song!")
             return
     
     try:
@@ -545,36 +545,36 @@ async def get_lyrics(ctx, *, query=None):
                         await ctx.send(embed=embed)
                         return
                 
-                # API başarısız olursa alternatif mesaj
-                await ctx.send(f"❌ **{query}** için şarkı sözleri bulunamadı!")
-                await ctx.send("💡 **İpucu:** Sanatçı adını da ekleyin: `+lyrics imagine dragons believer`")
+                # Alternative message if API fails
+                await ctx.send(f"❌ Lyrics not found for **{query}**!")
+                await ctx.send("💡 **Tip:** Include artist name: `+lyrics imagine dragons believer`")
                 
     except asyncio.TimeoutError:
-        await ctx.send("❌ Şarkı sözleri araması zaman aşımına uğradı!")
+        await ctx.send("❌ Lyrics search timed out!")
     except Exception as e:
-        await ctx.send(f"❌ Şarkı sözleri getirilirken hata oluştu: {str(e)[:100]}...")
+        await ctx.send(f"❌ Error occurred while fetching lyrics: {str(e)[:100]}...")
 
-@bot.command(name='komutlar', aliases=['commands', 'yardim'])
+@bot.command(name='commands', aliases=['help', 'komutlar', 'yardim'])
 async def help_command(ctx):
-    """Yardım ve komut listesi"""
+    """Help and command list"""
     embed = discord.Embed(
-        title="🎵 Müzik Bot Komutları",
-        description="YouTube ve Spotify linklerini destekleyen Discord müzik botu",
+        title="🎵 Music Bot Commands",
+        description="Discord music bot supporting YouTube and Spotify links",
         color=0x00ff00
     )
     
     commands_list = [
-        ("🎵 `+play [şarkı/link]`", "Şarkı çalar (YouTube/Spotify linki veya şarkı ismi)"),
-        ("⏭️ `+skip`", "Şu anki şarkıyı atlar"),
-        ("⏸️ `+pause`", "Müziği duraklatır"),
-        ("▶️ `+resume`", "Müziği devam ettirir"),
-        ("⏹️ `+stop`", "Müziği durdurur ve kuyruğu temizler"),
-        ("📋 `+queue`", "Müzik kuyruğunu gösterir"),
-        ("🔀 `+shuffle`", "Kuyruğu karıştırır"),
-        ("🎤 `+lyrics [şarkı]`", "Şarkı sözlerini gösterir"),
-        ("📊 `+status`", "Bot durumu ve istatistikleri"),
-        ("🚪 `+disconnect`", "Botun ses kanalından çıkmasını sağlar"),
-        ("🧹 `+clear [sayı]`", "Mesajları temizler")
+        ("🎵 `+play [song/link]`", "Play music (YouTube/Spotify link or song name)"),
+        ("⏭️ `+skip`", "Skip the current song"),
+        ("⏸️ `+pause`", "Pause the music"),
+        ("▶️ `+resume`", "Resume the music"),
+        ("⏹️ `+stop`", "Stop music and clear queue"),
+        ("📋 `+queue`", "Show the music queue"),
+        ("🔀 `+shuffle`", "Shuffle the queue"),
+        ("🎤 `+lyrics [song]`", "Show song lyrics"),
+        ("📊 `+status`", "Bot status and statistics"),
+        ("🚪 `+disconnect`", "Disconnect bot from voice channel"),
+        ("🧹 `+clear [number]`", "Clear messages")
     ]
     
     for name, value in commands_list:
@@ -582,79 +582,79 @@ async def help_command(ctx):
     
     embed.add_field(
         name="🐳 Container-Optimized System",
-        value="• **Multi-Client Strategy:** Android, Web, Basic format fallback\n• **Container Environment:** Railway/Docker için optimize edilmiş\n• **Format Flexibility:** M4A, WebM, MP4 formatları\n• **Invidious Backup:** YouTube başarısızsa alternatif arama",
+        value="• **Multi-Client Strategy:** Android, Web, Basic format fallback\n• **Container Environment:** Optimized for Railway/Docker\n• **Format Flexibility:** M4A, WebM, MP4 formats\n• **Invidious Backup:** Alternative search when YouTube fails",
         inline=False
     )
     
-    embed.set_footer(text="Bu bot açık kaynak kodludur ve sürekli geliştirilmektedir.")
+    embed.add_field(
+        name="🇹🇷 Turkish Commands Support",
+        value="• `+cal` / `+oynat` → `+play`\n• `+atla` → `+skip`\n• `+dur` → `+pause`\n• `+devam` → `+resume`\n• `+durdur` → `+stop`\n• `+kuyruk` → `+queue`\n• `+karistir` → `+shuffle`\n• `+sozler` → `+lyrics`\n• `+durum` → `+status`\n• `+ayril` → `+disconnect`",
+        inline=False
+    )
+    
+    embed.set_footer(text="This bot is open source and continuously developed.")
     await ctx.send(embed=embed)
-
-@bot.command(name='help')
-async def help_redirect(ctx):
-    """Help komutu yönlendirmesi"""
-    await ctx.send("ℹ️ Komut listesi için `+komutlar` yazın!")
-    await ctx.send("💡 Alternatifler: `+commands` veya `+yardim`")
 
 @bot.command(name='status', aliases=['durum'])
 async def bot_status(ctx):
-    """Bot durumu ve istatistikleri"""
-    embed = discord.Embed(title="🤖 Bot Durumu", color=0x0099ff)
+    """Bot status and statistics"""
+    embed = discord.Embed(title="🤖 Bot Status", color=0x0099ff)
     
-    # Ses kanalı durumu
+    # Voice channel status
     if ctx.voice_client:
         if ctx.voice_client.is_playing():
-            embed.add_field(name="🎵 Durum", value="Çalıyor", inline=True)
+            embed.add_field(name="🎵 Status", value="Playing", inline=True)
         elif ctx.voice_client.is_paused():
-            embed.add_field(name="⏸️ Durum", value="Duraklatıldı", inline=True)
+            embed.add_field(name="⏸️ Status", value="Paused", inline=True)
         else:
-            embed.add_field(name="⏹️ Durum", value="Durduruldu", inline=True)
+            embed.add_field(name="⏹️ Status", value="Stopped", inline=True)
             
-        embed.add_field(name="📍 Kanal", value=ctx.voice_client.channel.name, inline=True)
+        embed.add_field(name="📍 Channel", value=ctx.voice_client.channel.name, inline=True)
     else:
-        embed.add_field(name="🚫 Durum", value="Bağlı değil", inline=True)
+        embed.add_field(name="🚫 Status", value="Not connected", inline=True)
     
-    # Kuyruk durumu
+    # Queue status
     guild_id = ctx.guild.id
     if guild_id in queues and queues[guild_id]:
-        embed.add_field(name="📋 Kuyruk", value=f"{len(queues[guild_id])} şarkı", inline=True)
+        embed.add_field(name="📋 Queue", value=f"{len(queues[guild_id])} songs", inline=True)
     else:
-        embed.add_field(name="📋 Kuyruk", value="Boş", inline=True)
+        embed.add_field(name="📋 Queue", value="Empty", inline=True)
     
-    embed.add_field(name="📊 Sunucu Sayısı", value=f"{len(bot.guilds)}", inline=True)
-    embed.add_field(name="👥 Kullanıcı Sayısı", value=f"{len(set(bot.get_all_members()))}", inline=True)
+    embed.add_field(name="📊 Server Count", value=f"{len(bot.guilds)}", inline=True)
+    embed.add_field(name="👥 User Count", value=f"{len(set(bot.get_all_members()))}", inline=True)
     
     await ctx.send(embed=embed)
 
-@bot.command(name='clear', aliases=['c', 'clean'])
+@bot.command(name='clear', aliases=['c', 'clean', 'temizle'])
 async def clear_messages(ctx, amount: int = 10):
     """Delete specified number of messages (default: 10, max: 100)"""
     
-    # İzin kontrolü
+    # Permission check
     if not ctx.author.guild_permissions.manage_messages:
-        await ctx.send("❌ Bu komutu kullanmak için 'Mesajları Yönet' izniniz olmalı!")
+        await ctx.send("❌ You need 'Manage Messages' permission to use this command!")
         return
     
-    # Miktar kontrolü
+    # Amount check
     if amount < 1:
-        await ctx.send("❌ Silinecek mesaj sayısı en az 1 olmalı!")
+        await ctx.send("❌ Number of messages to delete must be at least 1!")
         return
     elif amount > 100:
-        await ctx.send("❌ Tek seferde en fazla 100 mesaj silebilirsiniz!")
+        await ctx.send("❌ You can delete a maximum of 100 messages at once!")
         return
     
     try:
-        # Mesajları sil (bot komut mesajını da dahil et)
+        # Delete messages (include bot command message)
         deleted = await ctx.channel.purge(limit=amount + 1)
         
-        # Başarı mesajı (5 saniye sonra silinecek)
-        success_msg = await ctx.send(f"✅ {len(deleted)-1} mesaj başarıyla silindi!")
+        # Success message (will be deleted after 5 seconds)
+        success_msg = await ctx.send(f"✅ {len(deleted)-1} messages deleted successfully!")
         await asyncio.sleep(5)
         await success_msg.delete()
         
     except discord.Forbidden:
-        await ctx.send("❌ Mesajları silmek için yeterli iznim yok!")
+        await ctx.send("❌ I don't have permission to delete messages!")
     except discord.HTTPException as e:
-        await ctx.send(f"❌ Mesajlar silinirken hata oluştu: {str(e)}")
+        await ctx.send(f"❌ Error occurred while deleting messages: {str(e)}")
 
 # Get bot token from environment variable
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')

@@ -22,11 +22,12 @@
 - **🛠️ Enhanced Error Handling** - Specific solutions for each error type
 - **📝 Professional Documentation** - Comprehensive README with troubleshooting guides
 
-#### 🇹🇷 User Experience Enhancements
-- **Turkish Interface** - Full Turkish user interface for Turkish users
+#### 🌐 User Experience Enhancements
+- **International Interface** - Full English interface with Turkish command aliases
 - **📊 Advanced Status Command** - Detailed bot statistics with `+status`
-- **❓ Comprehensive Help System** - Complete command guide with `+komutlar`
+- **❓ Comprehensive Help System** - Complete command guide with `+commands`
 - **🔄 Smart Fallback System** - Automatically tries next method when one fails
+- **🇹🇷 Turkish Command Support** - Turkish aliases for all commands (e.g., `+cal` for `+play`)
 
 #### 🎵 Music Features
 - **📝 Enhanced Lyrics System** - Integration with lyrics.ovh API
@@ -102,48 +103,56 @@
 ## 🎮 Commands
 
 ### Music Commands
-| Command | Alias | Description |
-|---------|-------|-------------|
-| `+play <song/link>` | `+p` | Plays YouTube/Spotify links or searches by song name |
-| `+queue` | `+q` | Shows the music queue |
-| `+skip` | `+s` | Skips the current song |
-| `+shuffle` | - | Shuffles the queue |
-| `+pause` | - | Pauses the music |
-| `+resume` | - | Resumes the music |
-| `+stop` | - | Stops music and clears queue |
-| `+disconnect` | `+leave`, `+dc` | Disconnects from voice channel |
+| Command | Aliases | Description |
+|---------|---------|-------------|
+| `+play <song/link>` | `+p`, `+cal`, `+oynat` | Plays YouTube/Spotify links or searches by song name |
+| `+queue` | `+q`, `+kuyruk` | Shows the music queue |
+| `+skip` | `+s`, `+atla` | Skips the current song |
+| `+shuffle` | `+karistir` | Shuffles the queue |
+| `+pause` | `+dur` | Pauses the music |
+| `+resume` | `+devam` | Resumes the music |
+| `+stop` | `+durdur` | Stops music and clears queue |
+| `+disconnect` | `+leave`, `+dc`, `+ayril` | Disconnects from voice channel |
 
 ### Utility Commands
-| Command | Alias | Description |
-|---------|-------|-------------|
-| `+lyrics [song]` | `+lyric` | Gets song lyrics (leave empty for current song) |
+| Command | Aliases | Description |
+|---------|---------|-------------|
+| `+lyrics [song]` | `+lyric`, `+sozler` | Gets song lyrics (leave empty for current song) |
 | `+status` | `+durum` | Shows bot status and statistics |
-| `+komutlar` | `+commands`, `+yardim` | Shows command list and help |
-| `+clear [number]` | `+c`, `+clean` | Deletes specified number of messages (default: 10) |
+| `+commands` | `+help`, `+komutlar`, `+yardim` | Shows command list and help |
+| `+clear [number]` | `+c`, `+clean`, `+temizle` | Deletes specified number of messages (default: 10) |
 
 ### Usage Examples
 
 ```bash
-# Play YouTube video
+# Play YouTube video (English/Turkish)
 +play https://www.youtube.com/watch?v=dQw4w9WgXcQ
++cal https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
 # Play Spotify song
 +play https://open.spotify.com/track/4iV5W9uYEdYUVa79Axb7Rh
 
-# Search by song name
+# Search by song name (English/Turkish)
 +play imagine dragons believer
++oynat imagine dragons believer
 
-# Queue control
-+queue
-+skip
-+shuffle
+# Queue control (English/Turkish)
++queue / +kuyruk
++skip / +atla
++shuffle / +karistir
 
-# Song lyrics
-+lyrics bohemian rhapsody
+# Music control (English/Turkish)
++pause / +dur
++resume / +devam
++stop / +durdur
+
+# Song lyrics (English/Turkish)
++lyrics bohemian rhapsody / +sozler bohemian rhapsody
 +lyrics  # (lyrics for currently playing song)
 
-# Bot status
-+status
+# Bot status and help (English/Turkish)
++status / +durum
++commands / +komutlar
 ```
 
 ## 🛠️ Advanced Configuration
